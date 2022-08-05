@@ -6,7 +6,7 @@
 #include <boost/archive/binary_oarchive.hpp>
 #include <boost/archive/binary_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_iarchive.hpp> 
 #include <boost/serialization/vector.hpp>
 #include <boost/serialization/map.hpp>
 
@@ -52,11 +52,14 @@ int main(int argc, char* argv[])
 	//ii) numOfTrees: count of itreees in the iforest.
 	//iii) smaplingFactor: Fraction of total points in dataset that will act as the sampleSize for iTree creation. 0 < samplingFactor < 1
 	//iv) minSampleSize: an interger value, useful when samplingFactor fails to give sufficient samples to create an iTree, when datset is small*/
+    //v) exLevel: an integer value, denoting extension level.
+
     srand(time(0));
 	const string &dataFile = argv[1];
 	const int &numOfTrees = atoi(argv[2]);
 	const double &samplingFactor = atof(argv[3]);
 	const int &minSampleSize = atoi(argv[4]);
+    int exLevel = atoi(argv[5]);
 	
     /************************************************dataPreparation******************************************************************/
 
@@ -76,7 +79,7 @@ int main(int argc, char* argv[])
 	sampleSize = countOfCurrentPoints * samplingFactor < minSampleSize ? minSampleSize :countOfCurrentPoints * samplingFactor;
     sampleSize = countOfCurrentPoints < sampleSize ? countOfCurrentPoints : sampleSize;
 	int iForestRamUsed = getValue(1);
-	iforest *iForestObject = new iforest(refDataObject, numOfTrees, sampleSize);
+	iforest *iForestObject = new iforest(refDataObject, numOfTrees, sampleSize, exLevel);
     struct timespec start_iF,end_iF;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_iF);
 
