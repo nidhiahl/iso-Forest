@@ -14,10 +14,10 @@ class iforest
     void constructiForest();    						//used for creating an iForest (static vesion) 
     void writeFOREST(const string &);					//writes iforest in file.
     void readFOREST(const string &);        			//reads iforest from file.
-	void computeAnomalyScore(int);		        		//compute anomaly score of a point passed as an int argument
+	void computeAnomalyScore(int, const data &);		        		//compute anomaly score of a point passed as an int argument
 	
 	private:    
-	long double computeAvgPathLength(int);              //compute average path length of point passed as an argumnet i.e Averaged across all the iTrees
+	long double computeAvgPathLength(int, const data &);              //compute average path length of point passed as an argumnet i.e Averaged across all the iTrees
     long double avgPathLengthEstimationOfBST(int);      //compute the average path length estimation of a 'n' sized BST, 'n' is passed as an argument
     long double avgPathLengthComputationOfBST();        //compute the actual average path length of all the created iTrees from randomly choosen sample points,
 

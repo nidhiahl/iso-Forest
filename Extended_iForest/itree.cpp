@@ -88,12 +88,12 @@ void itree::constructiTree(int random_seed){
 
 
 //*******************************************************Compute path length**************************************************************//
-long double itree::computePathLength(int pointX){
+long double itree::computePathLength(int pointX, const data & testDataObject){
 	long double pathLength = 0;
 	treenode * node = rootNode;
 	while(!node->isLeaf){
 		//pathLength++;
-		double pointxdotn = inner_product(_dataObject.dataVector[pointX]->attributes, node->normal_vector);
+		double pointxdotn = inner_product(testDataObject.dataVector[pointX]->attributes, node->normal_vector);
 		if(pointxdotn < node->splitValue){
 			node = node->lChildAdd;
 		}else{

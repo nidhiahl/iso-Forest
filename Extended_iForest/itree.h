@@ -7,13 +7,13 @@
 #include <random>
 
 class itree
-{
+{ 
     public:
         itree(const data &);									//used for: create an empty tree to load the itree from file and insert new points in data object
         itree(const data &,int, int, int, int, int);					//used for: create a tree using data object and initialize
         virtual ~itree();
         void constructiTree(int);									//used for: construct itree split the nodes and grow the itree as per definition
-		long double computePathLength(int);						//compute PL = height of point + adjaustment for unbuilt tree below max.height
+		long double computePathLength(int, const data &);						//compute PL = height of point + adjaustment for unbuilt tree below max.height
 		long double avgPathLengthComputationOfBST();			//compute avg PL for actual structure of iTree the sample in hand (Not estimation)
 		long double pathLengthEstimationForUnbuiltTree(int );	//avg PL estimation for given size iTree(samples size)
 		treenode * rootNode;									//address of root node of the tree
