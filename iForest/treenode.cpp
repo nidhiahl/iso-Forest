@@ -1,5 +1,8 @@
 #include "treenode.h"
 #include <math.h>
+#include <random>
+
+
 treenode::treenode()
 {
     splitAttribute = -1;
@@ -43,11 +46,16 @@ treenode::~treenode()
 
 
 double treenode::splitInfoSelection(const data &dataObject){
-	int maxVal = -999999;
-	int minVal = 999999;
+
+    std::random_device random_seed_generator;
+    std::mt19937_64 RandomEngine(random_seed_generator());
+
+	double maxVal = -999999.0;
+	double minVal = 999999.0;
 	int attempts = 0;
 	while(attempts < 10){
-		splitAttribute = rand()%dataObject.getnumAttributes();
+        splitAttribute = std::uniform_int_distribution<>(0, dataObject.getnumAttributes()-1)(RandomEngine);
+
 		for( int i = 0; i < dataPointIndices.size(); i++){
         		if(maxVal < dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute]){
 				maxVal = dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute];
@@ -65,7 +73,8 @@ double treenode::splitInfoSelection(const data &dataObject){
 	//cout<<"diiffffeeerreeennncccee = "<<maxVal-minVal<<endl;
 	maximumVal = maxVal;
 	minimumVal = minVal;
-	return (minVal + ((double)rand()/RAND_MAX)*(maxVal-minVal));
+
+    return std::uniform_real_distribution<double> (minVal, maxVal)(RandomEngine);
 }
 
 

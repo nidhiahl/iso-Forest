@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
 
 	/****************************************Anomaly Score writing to file**************************************************************/
 
-    string outputFileName="anomalyScores/"+dataFile.substr(10,dataFile.length()-14)+"_tested_over_"+dataFile2.substr(10);
+    string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10);
     // cout<<outputFileName<<endl;
 	ofstream outAnomalyScore(outputFileName, ios::out|ios::binary);
     outAnomalyScore<<"pointId "<<"Ascore "<<"actuallabel"<<endl;

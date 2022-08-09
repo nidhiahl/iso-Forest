@@ -124,7 +124,9 @@ int main(int argc, char* argv[])
 
 	/****************************************Anomaly Score writing to file**************************************************************/
 
-	ofstream outAnomalyScore(dataFile+"iForestAnomalyScore.csv", ios::out|ios::binary);
+	string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10, dataFile.length()-14)+"_exlevel_"+to_string(exLevel)+".csv";
+    // cout<<outputFileName<<endl;
+	ofstream outAnomalyScore(outputFileName, ios::out|ios::binary);
     outAnomalyScore<<"pointId "<<"Ascore "<<"actuallabel"<<endl;
     for(int pointi = 0; pointi < testDataObject.getnumInstances(); pointi++){
     	outAnomalyScore<<pointi<<" "<<AnomalyScore[pointi]<<" "<<testDataObject.dataVector[pointi]->label<<endl;
