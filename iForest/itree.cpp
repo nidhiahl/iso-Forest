@@ -64,12 +64,12 @@ void itree::constructiTree(){
 
 
 //*******************************************************Compute path length**************************************************************//
-long double itree::computePathLength(int pointX){
+long double itree::computePathLength(int pointX, const data & testDataObject){
 	long double pathLength = 0;
 	treenode * node = rootNode;
 	while(!node->isLeaf){
 		//pathLength++;
-		if(_dataObject.dataVector[pointX]->attributes[node->splitAttribute] < node->splitValue){
+		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] < node->splitValue){
 			node = node->lChildAdd;
 		}else{
 			node = node->rChildAdd;

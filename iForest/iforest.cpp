@@ -33,8 +33,8 @@ void iforest::constructiForest(){
 
 //***************************************Evaluation: Anoamly detection AD: anomaly score computation *************************************//
 
-void iforest::computeAnomalyScore(int pointX){
-	long double avgPathLength = computeAvgPathLength(pointX);
+void iforest::computeAnomalyScore(int pointX, const data & testDataObject){
+	long double avgPathLength = computeAvgPathLength(pointX, testDataObject);
 	//long double AscoreComputed = pow(2,-(avgPathLength/_avgPLComputationOfBST));       
 	long double AscoreEstimated = pow(2,-(avgPathLength/_avgPLEstimationOfBST));
 	
@@ -59,10 +59,10 @@ long double iforest::avgPathLengthComputationOfBST(){
 }
 
 
-long double iforest::computeAvgPathLength(int pointX){
+long double iforest::computeAvgPathLength(int pointX, const data & testDataObject){
 	long double avgPathLength = 0;
 	for(int treeId = 0; treeId < _numiTrees; treeId++){
-		avgPathLength += _iTrees[treeId]->computePathLength(pointX);
+		avgPathLength += _iTrees[treeId]->computePathLength(pointX, testDataObject);
 	}
 	avgPathLength /=_numiTrees;
 	return avgPathLength;

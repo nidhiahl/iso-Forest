@@ -58,17 +58,24 @@ int main(int argc, char* argv[])
 	const double &samplingFactor = atof(argv[3]);
 	const int &minSampleSize = atoi(argv[4]);
 	
+    //This is for testing on different data.
+    const string &dataFile2 = argv[5];
+
     /************************************************dataPreparation******************************************************************/
 
     struct timespec start_dP,end_dP;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_dP);
     data *dataObject = new data();
-    const data &refDataObject = *dataObject;
+    const data &trainDataObject = *dataObject;
     dataObject->createDataVector(dataFile);
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_dP);
     double dPTime =  (((end_dP.tv_sec - start_dP.tv_sec) * 1e9)+(end_dP.tv_nsec - start_dP.tv_nsec))*1e-9;
     //cout<<"Time taken in dP: "<< fixed<<dPTime<<"sec"<<endl;
 
+    //This is for testing on different data
+    data *dataObject2 = new data();
+    const data &testDataObject = *dataObject2;
+    dataObject2->createDataVector(dataFile2);
 
     /************************************************iForest creation***************************************************/
     int sampleSize;
@@ -76,7 +83,7 @@ int main(int argc, char* argv[])
 	sampleSize = countOfCurrentPoints * samplingFactor < minSampleSize ? minSampleSize :countOfCurrentPoints * samplingFactor;
     sampleSize = countOfCurrentPoints < sampleSize ? countOfCurrentPoints : sampleSize;
 	int iForestRamUsed = getValue(1);
-	iforest *iForestObject = new iforest(refDataObject, numOfTrees, sampleSize);
+	iforest *iForestObject = new iforest(trainDataObject, numOfTrees, sampleSize);
     struct timespec start_iF,end_iF;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_iF);
 
@@ -95,8 +102,8 @@ int main(int argc, char* argv[])
 	struct timespec start_AD,end_AD;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_AD);
     
-	for(int pointi =0; pointi < refDataObject.getnumInstances();pointi++){
-    	iForestObject->computeAnomalyScore(pointi);
+	for(int pointi =0; pointi < testDataObject.getnumInstances();pointi++){
+    	iForestObject->computeAnomalyScore(pointi, testDataObject);
    	}
    	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_AD);
 	iForestRamUsed = getValue(1) - iForestRamUsed;
@@ -112,10 +119,12 @@ int main(int argc, char* argv[])
 
 	/****************************************Anomaly Score writing to file**************************************************************/
 
-	ofstream outAnomalyScore(dataFile+"iForestAnomalyScore.csv", ios::out|ios::binary);
+    string outputFileName="anomalyScores/"+dataFile.substr(10,dataFile.length()-14)+"_tested_over_"+dataFile2.substr(10);
+    // cout<<outputFileName<<endl;
+	ofstream outAnomalyScore(outputFileName, ios::out|ios::binary);
     outAnomalyScore<<"pointId "<<"Ascore "<<"actuallabel"<<endl;
-    for(int pointi = 0; pointi < refDataObject.getnumInstances(); pointi++){
-    	outAnomalyScore<<pointi<<" "<<AnomalyScore[pointi]<<" "<<refDataObject.dataVector[pointi]->label<<endl;
+    for(int pointi = 0; pointi < testDataObject.getnumInstances(); pointi++){
+    	outAnomalyScore<<pointi<<" "<<AnomalyScore[pointi]<<" "<<testDataObject.dataVector[pointi]->label<<endl;
     }
 
 
