@@ -10,7 +10,7 @@ class iforest
     iforest(const data &);                              //used for: create an empty forest load the iforest from file and insert new points in data object
 	iforest(const data &, int, int);                    //used for: create a forest using data object and initialize _sampleSize and _numiTrees
     virtual ~iforest();
-    void constructiForest();    						//used for creating an iForest (static vesion) 
+    void constructiForest(int, int);    						//used for creating an iForest (static vesion) 
     void writeFOREST(const string &);					//writes iforest in file.
     void readFOREST(const string &);        			//reads iforest from file.
 	void computeAnomalyScore(int, const data &);		        		//compute anomaly score of a point passed as an int argument
@@ -32,7 +32,6 @@ class iforest
 	int _avgPLComputationOfBST;
 	const data & _dataObject;							//reference of the input dataObject, only a container not responsible for deletion of the object.
 	vector<itree*> _iTrees;								//list of pointers to the iTrees in the forest.
-	    
     
     friend class boost::serialization::access;
     template<class Archive>

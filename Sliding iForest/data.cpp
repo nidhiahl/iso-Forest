@@ -75,11 +75,11 @@ void data::createDataVector(const string & dataFile){
 }
 
 //***************************************Select sample from the original dataset i.e for static run****************************************//
-vector<int> & data::getSample(int sampleSize) const {
+vector<int> & data::getSample(int sampleSize, int windowStartIndex, int windowSize) const {
 	vector<int>* sample = new vector<int>;             //To do:We can replace a local smaple with a shared one among all the trees.
 	vector<int> &refSample = *sample;
 	int cnt = 0;
-	for(int i = 0; i < numInstances; i++){
+	for(int i = windowStartIndex; i < windowStartIndex+windowSize; i++){
 		if(dataVector[i]->isPresent){
 			(*sample).push_back(i);
 			cnt++;

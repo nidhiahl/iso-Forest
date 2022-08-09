@@ -19,7 +19,7 @@ class data
         data();
         virtual ~data();
         void createDataVector(const string &);
-        vector<int> & getSample(int) const ;
+        vector<int> & getSample(int, int, int) const ;
         vector<point*>  getDataVector() const ;
         int getnumInstances() const;
         void setnumInstances(int);

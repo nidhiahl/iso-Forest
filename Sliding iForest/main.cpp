@@ -57,9 +57,10 @@ int main(int argc, char* argv[])
 	const int &numOfTrees = atoi(argv[2]);
 	const double &samplingFactor = atof(argv[3]);
 	const int &minSampleSize = atoi(argv[4]);
-	
+	const int &windowSize = atoi(argv[5]);
+
     //This is for testing on different data.
-    const string &dataFile2 = argv[5];
+    const string &dataFile2 = argv[6];
 
     /************************************************dataPreparation******************************************************************/
 
@@ -81,13 +82,53 @@ int main(int argc, char* argv[])
     int sampleSize;
     int countOfCurrentPoints = dataObject->getnumInstances();
 	sampleSize = countOfCurrentPoints * samplingFactor < minSampleSize ? minSampleSize :countOfCurrentPoints * samplingFactor;
-    sampleSize = countOfCurrentPoints < sampleSize ? countOfCurrentPoints : sampleSize;
+    sampleSize = windowSize < sampleSize ? windowSize : sampleSize;
 	int iForestRamUsed = getValue(1);
 	iforest *iForestObject = new iforest(trainDataObject, numOfTrees, sampleSize);
     struct timespec start_iF,end_iF;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_iF);
 
-    iForestObject->constructiForest();
+    //Sliding iForest Logic****
+    int windowStartIndex=0;
+    double anomaly_rate=0.05;
+
+    iForestObject->constructiForest(windowStartIndex, windowSize);
+    vector<pair<double, int>> AnomalyScores;
+
+    for(int windowStartIndex=0; windowStartIndex<trainDataObject.getnumInstances(); windowStartIndex+=windowSize)
+    {
+        int actualAnomalies=0;
+        int truePositives=0;
+        iForestObject->anomalyScore.clear();
+        AnomalyScores.clear();
+
+        for(int pointi=windowStartIndex; pointi<windowStartIndex+windowSize; pointi++)
+        {
+            iForestObject->computeAnomalyScore(pointi, trainDataObject);
+            AnomalyScores.push_back({iForestObject->anomalyScore[pointi-windowStartIndex], pointi});
+        }
+
+        sort(AnomalyScores.begin(), AnomalyScores.end());
+        reverse(AnomalyScores.begin(), AnomalyScores.end());
+
+        for(pair<double, int> tmp: AnomalyScores)
+        {
+            if(trainDataObject.dataVector[tmp.second]->label == 1) actualAnomalies++;
+        }
+
+        for(int i=0; i<actualAnomalies; i++)
+        {
+            if(trainDataObject.dataVector[AnomalyScores[i].second]->label == 1) truePositives++;
+        }
+
+        if(truePositives > anomaly_rate*windowSize)
+        {
+            iForestObject->constructiForest(windowStartIndex, windowSize);
+        }
+        
+    }
+    
+
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_iF);
 	iForestRamUsed = getValue(1) - iForestRamUsed;
 	double iFTime =  (((end_iF.tv_sec - start_iF.tv_sec) * 1e9)+(end_iF.tv_nsec - start_iF.tv_nsec))*1e-9;

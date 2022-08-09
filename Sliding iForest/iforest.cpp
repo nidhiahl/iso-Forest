@@ -20,10 +20,10 @@ iforest::iforest(const data & dataObject, int numiTrees, int sampleSize):_dataOb
 iforest::~iforest(){}
 
 //***************************************************Training: iForest creation*********************************************************//
-void iforest::constructiForest(){
+void iforest::constructiForest(int windowStartIndex, int windowSize){
     for(int treeId = 0; treeId < _numiTrees; treeId++){
 		_iTrees[treeId] = new itree(_dataObject, _sampleSize, _maxTreeHeight, _maxNumOfNodes, _avgPLEstimationOfBST);
-		_iTrees[treeId]->constructiTree();
+		_iTrees[treeId]->constructiTree(windowStartIndex, windowSize);
 	}
 	//_avgPLComputationOfBST = this->avgPathLengthComputationOfBST();
 	_avgPLEstimationOfBST = this->avgPathLengthEstimationOfBST(_sampleSize);

@@ -9,9 +9,9 @@ itree::itree(const data & dataObject, int sampleSize, int maxTreeHeight, int max
 
 itree::~itree(){}
 //*************************************************STATIC iTree creation*******************************************************************//
-void itree::constructiTree(){
+void itree::constructiTree(int windowStartIndex, int windowSize){
     rootNode = new treenode(0);
-    rootNode->dataPointIndices = _dataObject.getSample(_sampleSize);
+    rootNode->dataPointIndices = _dataObject.getSample(_sampleSize, windowStartIndex, windowSize);
     //cout<<"smapleSize"<<rootNode->dataPointIndices.size()<<endl;
     queue<treenode*> BFTforNodes;
     BFTforNodes.push(rootNode);
