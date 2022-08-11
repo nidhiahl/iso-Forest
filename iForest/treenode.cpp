@@ -70,7 +70,6 @@ double treenode::splitInfoSelection(const data &dataObject){
 			attempts = 10;
 		}
 	}
-	//cout<<"diiffffeeerreeennncccee = "<<maxVal-minVal<<endl;
 	maximumVal = maxVal;
 	minimumVal = minVal;
 

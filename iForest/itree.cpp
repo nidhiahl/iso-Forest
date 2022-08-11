@@ -12,7 +12,6 @@ itree::~itree(){}
 void itree::constructiTree(){
     rootNode = new treenode(0);
     rootNode->dataPointIndices = _dataObject.getSample(_sampleSize);
-    //cout<<"smapleSize"<<rootNode->dataPointIndices.size()<<endl;
     queue<treenode*> BFTforNodes;
     BFTforNodes.push(rootNode);
     while(!BFTforNodes.empty()){
@@ -24,7 +23,6 @@ void itree::constructiTree(){
 			if(currNode->nodeSize <=1 || currNode->nodeHeight ==_maxTreeHeight){
     			currNode->pathLengthEst = pathLengthEstimationForUnbuiltTree(currNode->nodeSize);
         		currNode->isLeaf = bool(1);
-        		//treeNode[nodeId]->isActive = bool(1);
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
     		}
@@ -32,8 +30,6 @@ void itree::constructiTree(){
     			currNode->splitValue = currNode->splitInfoSelection(_dataObject);
     			currNode->createLeftChild();
 				currNode->createRightChild();
-				//treenode *left = new treenode(2*nodeId+1);
-        		//treenode *right = new treenode(2*nodeId+2);
 				for(int i=0; i<currNode->nodeSize; i++){     
             		if(_dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute]<currNode->splitValue){
                 		currNode->lChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
@@ -43,13 +39,6 @@ void itree::constructiTree(){
             		}
 
         		}
-        		//left->parentAdd = currNode;
-        		//currNode->lChildAdd = left;
-        		//currNode->lChildId = left->nodeId;
-        		
-        		//right->parentAdd = currNode;
-        		//currNode->rChildAdd = right;
-        		//currNode->rChildId = right->nodeId;
         		
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
@@ -68,20 +57,14 @@ long double itree::computePathLength(int pointX, const data & testDataObject){
 	long double pathLength = 0;
 	treenode * node = rootNode;
 	while(!node->isLeaf){
-		//pathLength++;
 		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] < node->splitValue){
 			node = node->lChildAdd;
 		}else{
 			node = node->rChildAdd;
 		}
 	}
-	//cout<<"PathLength="<<pathLength;
-	//pathLength +=  node->pathLengthEst;
-	//cout<<" final PL="<<pathLength;
 	
-	//cout<<"----------nodeHeight="<<node->nodeHeight;
 	pathLength = node->nodeHeight - 1 + node->pathLengthEst;
-	//cout<<" final PL="<<pathLength<<endl;
 	return pathLength;
 }
 
@@ -90,7 +73,6 @@ long double itree::avgPathLengthComputationOfBST(){
 	queue<treenode *> BFTqueue;
 	BFTqueue.push(rootNode);
 	while(!BFTqueue.empty()){
-		//pathLength++;
 		treenode *node = BFTqueue.front();
     	BFTqueue.pop();
 		

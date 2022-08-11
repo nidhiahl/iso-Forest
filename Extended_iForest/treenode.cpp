@@ -2,7 +2,7 @@
 #include <math.h>
 #include <random>
 
-
+//get K random samples out of N without replacement.
 inline std::vector<int> sample_without_replacement(int k, int N)
 {
     std::random_device random_seed_generator;
@@ -22,6 +22,7 @@ inline std::vector<int> sample_without_replacement(int k, int N)
     return result;    
 }
 
+//inner product of two vectors
 inline double inner_product(std::vector<double>& point, std::vector<double>& normal_vector)
 {
     double result=0.0;
@@ -31,7 +32,6 @@ inline double inner_product(std::vector<double>& point, std::vector<double>& nor
 
 treenode::treenode()
 {
-    // splitAttribute = -1;
     isLeaf = bool(0);
     nodeId = -1;
     parentId = -1;
@@ -48,7 +48,6 @@ treenode::treenode()
 
 treenode::treenode(int nId): nodeId(nId)
 {
-    // splitAttribute = -1;
     isLeaf = bool(0);
     parentId = nodeId == 0 ? 0 : (nodeId-1)/2;
     lChildId = -1;
@@ -72,6 +71,7 @@ double treenode::splitInfoSelection(const data &dataObject, int &exLevel, int ra
    
     std::mt19937_64 RandomEngine (random_seed);
 
+    //get maximum and minimum value of every attribute.
     std::vector<double> Xmins, Xmaxs;
     for(int i=0; i<dataObject.getnumAttributes(); i++)
     {
@@ -84,30 +84,29 @@ double treenode::splitInfoSelection(const data &dataObject, int &exLevel, int ra
         }
     }
 
+    //get random point from which the hyperplane would pass.
     point.resize(dataObject.getnumAttributes(), 0.0);
     for(int i=0; i<dataObject.getnumAttributes(); i++)
     {
         point[i]=std::uniform_real_distribution<double> (Xmins[i], Xmaxs[i])(RandomEngine);
     }
 
+    //get random normal vector of the hyperplane.
     normal_vector.resize(dataObject.getnumAttributes(), 0.0);
     for(int i=0; i<dataObject.getnumAttributes(); i++)
     {
         normal_vector[i]=std::normal_distribution<double> (0.0, 1.0)(RandomEngine);
     }
 
+    //get attributes not be used for dividing the data set.
     std::vector<int> normvect_zero_index = sample_without_replacement (dataObject.getnumAttributes()-exLevel-1, dataObject.getnumAttributes());
+    //set normal vector component as zero for attributes not to be used for dividing the data set.
     for(int j=0; j<dataObject.getnumAttributes()-exLevel-1; j++)
     {
         normal_vector[normvect_zero_index[j]-1] = 0.0;
     }
-
-    // for(int i=0;i<normal_vector.size();i++) std::cout<<normal_vector[i]<<" ";
-    // std::cout<<endl;
-    // for(int i=0;i<point.size();i++) std::cout<<point[i]<<" ";
-    // std::cout<<endl;
-    // std::cout<<endl;
     
+    //get split value by taking inner product of normal_vector with the random point.
     double  pdotn = inner_product(point, normal_vector);
     return pdotn;  
 }

@@ -37,8 +37,7 @@ void iforest::computeAnomalyScore(int pointX, const data & testDataObject){
 	long double avgPathLength = computeAvgPathLength(pointX, testDataObject);
 	//long double AscoreComputed = pow(2,-(avgPathLength/_avgPLComputationOfBST));       
 	long double AscoreEstimated = pow(2,-(avgPathLength/_avgPLEstimationOfBST));
-	
-	//cout<<"pointX: "<<pointX<<"----------AscoreComputed: "<<AscoreComputed<<"-------------AscoreEstimated: "<<AscoreEstimated<<endl;
+
 	anomalyScore.push_back(AscoreEstimated);
 }
 

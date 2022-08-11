@@ -55,7 +55,6 @@ void data::createDataVector(const string & dataFile){
 		exit(0);
 	}
 	inDataFile>>numInstances>>numAttributes;
-	//cout<<numInstances<<"nnnnn "<<numAttributes<<endl;
 	dataVector.resize(numInstances);
 	for(int instance = 0; instance < numInstances; instance++){
 		point *newPoint = new point();
@@ -69,14 +68,13 @@ void data::createDataVector(const string & dataFile){
 		inDataFile>>newPoint->label;
 		newPoint->isPresent = bool(1);
 		dataVector[id] = newPoint;
-		//cout<<"label["<<id<<"]="<<dataVector[id]->label<<endl;
 	}
 	inDataFile.close();
 }
 
 //***************************************Select sample from the original dataset i.e for static run****************************************//
 vector<int> & data::getSample(int sampleSize) const {
-	vector<int>* sample = new vector<int>;             //To do:We can replace a local smaple with a shared one among all the trees.
+	vector<int>* sample = new vector<int>;            
 	vector<int> &refSample = *sample;
 	int cnt = 0;
 	for(int i = 0; i < numInstances; i++){
