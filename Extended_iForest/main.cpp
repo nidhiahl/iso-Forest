@@ -54,6 +54,7 @@ int main(int argc, char* argv[])
 	//iv) minSampleSize: an interger value, useful when samplingFactor fails to give sufficient samples to create an iTree, when datset is small*/
     //v) exLevel: an integer value, denoting extension level.
 
+    //PASS: attribute 5 (exlevel) as 0 to get basic iForest Implementation.
     srand(time(0));
 	const string &dataFile = argv[1];
 	const int &numOfTrees = atoi(argv[2]);
