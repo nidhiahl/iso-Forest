@@ -3,6 +3,7 @@
 #include <queue>
 
 
+//inner product of two vectors
 inline double inner_product(double* curr, std::vector<double>& normal_vector)
 {
     double result=0.0;
@@ -14,7 +15,7 @@ inline double inner_product(double* curr, std::vector<double>& normal_vector)
 
 itree::itree(const data & dataObject): _dataObject(dataObject){}
 
-itree::itree(const data & dataObject, int sampleSize, int maxTreeHeight, int maxNumOfNodes, int avgPLEstimation, int exLevel, int numOfTrialsForHyperplane): _dataObject(dataObject), _sampleSize(sampleSize), _maxTreeHeight(maxTreeHeight), _maxNumOfNodes(maxNumOfNodes), _exLevel(exLevel), _numOfTrialsForHyperplane(numOfTrialsForHyperplane){}
+itree::itree(const data & dataObject, int sampleSize, int maxTreeHeight, int maxNumOfNodes, int avgPLEstimation, int numOfAttributes, int numOfTrialsForHyperplane): _dataObject(dataObject), _sampleSize(sampleSize), _maxTreeHeight(maxTreeHeight), _maxNumOfNodes(maxNumOfNodes), _numOfAttributes(numOfAttributes), _numOfTrialsForHyperplane(numOfTrialsForHyperplane){}
 
 itree::~itree(){}
 
@@ -23,7 +24,7 @@ void itree::constructiTree(int random_seed){
     rootNode = new treenode(0);
     rootNode->dataPointIndices = _dataObject.getSample(_sampleSize);
 	std::random_device random_seed_generator;
-    //cout<<"smapleSize"<<rootNode->dataPointIndices.size()<<endl;
+  
     queue<treenode*> BFTforNodes;
     BFTforNodes.push(rootNode);
 	
@@ -34,34 +35,20 @@ void itree::constructiTree(int random_seed){
 			currNode->nodeSize = currNode->dataPointIndices.size();
 			currNode->pathLengthEst = pathLengthEstimationForUnbuiltTree(currNode->nodeSize);
 			if(currNode->nodeSize <=2 || currNode->nodeHeight ==_maxTreeHeight){
-				// cout<<currNode->nodeSize<<endl;
     			currNode->pathLengthEst = pathLengthEstimationForUnbuiltTree(currNode->nodeSize);
         		currNode->isLeaf = bool(1);
-        		//treeNode[nodeId]->isActive = bool(1);
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
     		}
     		else{
 
-    			currNode->splitInfoSelection(_dataObject, _exLevel, _numOfTrialsForHyperplane, random_seed_generator()+random_seed);
+    			currNode->splitInfoSelection(_dataObject, _numOfAttributes, _numOfTrialsForHyperplane, random_seed_generator()+random_seed);
 				currNode->createLeftChild();
 				currNode->createRightChild();
-				//treenode *left = new treenode(2*nodeId+1);
-        		//treenode *right = new treenode(2*nodeId+2);
-				// for(int i=0; i<currNode->nodeSize; i++){     
-            	// 	if(_dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute]<currNode->splitValue){
-                // 		currNode->lChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
-            	// 	}
-            	// 	else{
-                // 		currNode->rChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
-            	// 	}
-
-        		// }
-
+			
 				for(int i=0; i<currNode->nodeSize; i++)
 				{
 					double currdotn = inner_product(_dataObject.dataVector[currNode->dataPointIndices[i]]->attributes, currNode->normal_vector);
-					// cout<<currdotn<<endl;
 					if(currdotn < currNode->splitValue){
 						currNode->lChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
 					}
@@ -69,13 +56,6 @@ void itree::constructiTree(int random_seed){
 						currNode->rChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
 					}
 				}
-        		//left->parentAdd = currNode;
-        		//currNode->lChildAdd = left;
-        		//currNode->lChildId = left->nodeId;
-        		
-        		//right->parentAdd = currNode;
-        		//currNode->rChildAdd = right;
-        		//currNode->rChildId = right->nodeId;
         		
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
@@ -94,14 +74,12 @@ long double itree::computePathLength(int pointX, const data & testDataObject){
 	long double pathLength = 0;
 	treenode * node = rootNode;
 	while(!node->isLeaf){
-		//pathLength++;
 		double pointxdotn = inner_product(testDataObject.dataVector[pointX]->attributes, node->normal_vector);
 
 		if(pointxdotn-node->splitValue < node->upperLimit && pointxdotn-node->splitValue > node->lowerLimit) 
 		{
 			pathLength+=1;
 		}
-		// pathLength+=1;
 
 		if(pointxdotn < node->splitValue){
 			node = node->lChildAdd;
@@ -109,13 +87,6 @@ long double itree::computePathLength(int pointX, const data & testDataObject){
 			node = node->rChildAdd;
 		}
 	}
-	//cout<<"PathLength="<<pathLength;
-	//pathLength +=  node->pathLengthEst;
-	//cout<<" final PL="<<pathLength;
-	
-	//cout<<"----------nodeHeight="<<node->nodeHeight;
-	// pathLength = node->nodeHeight - 1 + node->pathLengthEst;
-	//cout<<" final PL="<<pathLength<<endl;
 	return pathLength;
 }
 
@@ -124,7 +95,6 @@ long double itree::avgPathLengthComputationOfBST(){
 	queue<treenode *> BFTqueue;
 	BFTqueue.push(rootNode);
 	while(!BFTqueue.empty()){
-		//pathLength++;
 		treenode *node = BFTqueue.front();
     	BFTqueue.pop();
 		

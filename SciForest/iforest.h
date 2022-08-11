@@ -7,7 +7,6 @@
 class iforest
 {
     public:
-	//iforest();
     iforest(const data &);                              //used for: create an empty forest load the iforest from file and insert new points in data object
 	iforest(const data &, int, int, int, int);          //used for: create a forest using data object and initialize _sampleSize and _numiTrees
     virtual ~iforest();
@@ -31,7 +30,7 @@ class iforest
   	int _maxNumOfNodes;									//max number of node possible in each iTree.
 	int _avgPLEstimationOfBST;							//average path length estimation of BST having '_sampleSize' number of nodes. 
 	int _avgPLComputationOfBST;
-	int _exLevel;                                       //number of attributes to be considered while choosing hyperplane.
+	int _numOfAttributes;                                       //number of attributes to be considered while choosing hyperplane.
 	int _numOfTrialsForHyperplane;                      //number of trials to be taken before choosing the best hyperplane.
 	const data & _dataObject;							//reference of the input dataObject, only a container not responsible for deletion of the object.
 	vector<itree*> _iTrees;								//list of pointers to the iTrees in the forest.

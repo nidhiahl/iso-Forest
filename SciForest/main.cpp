@@ -52,18 +52,19 @@ int main(int argc, char* argv[])
 	//ii) numOfTrees: count of itreees in the iforest.
 	//iii) smaplingFactor: Fraction of total points in dataset that will act as the sampleSize for iTree creation. 0 < samplingFactor < 1
 	//iv) minSampleSize: an interger value, useful when samplingFactor fails to give sufficient samples to create an iTree, when datset is small*/
-    //v) exLevel: an integer value, denoting extension level.
+    //v) numOfAttributes: an integer value, denoting extension level.
 
     srand(time(0));
 	const string &dataFile = argv[1];
 	const int &numOfTrees = atoi(argv[2]);
 	const double &samplingFactor = atof(argv[3]);
 	const int &minSampleSize = atoi(argv[4]);
-    const int numOfTrialsForHyperplane = atoi(argv[5]);
-    const int exLevel = atoi(argv[6]);
+    const int numOfAttributes = atoi(argv[5]);
+    const int numOfTrialsForHyperplane = atoi(argv[6]);
+    
     	
     //This is for testing on different data.
-    const string &dataFile2 = argv[7];
+    // const string &dataFile2 = argv[7];
 	
     /************************************************dataPreparation******************************************************************/
 
@@ -74,12 +75,12 @@ int main(int argc, char* argv[])
     dataObject->createDataVector(dataFile);
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_dP);
     double dPTime =  (((end_dP.tv_sec - start_dP.tv_sec) * 1e9)+(end_dP.tv_nsec - start_dP.tv_nsec))*1e-9;
-    //cout<<"Time taken in dP: "<< fixed<<dPTime<<"sec"<<endl;
     
     //This is for testing on different data
-    data *dataObject2 = new data();
-    const data &testDataObject = *dataObject2;
-    dataObject2->createDataVector(dataFile2);
+    // data *dataObject2 = new data();
+    // const data &testDataObject = *dataObject2;
+    // dataObject2->createDataVector(dataFile2);
+    const data &testDataObject = *dataObject;
     
     /************************************************iForest creation***************************************************/
     int sampleSize;
@@ -87,7 +88,7 @@ int main(int argc, char* argv[])
 	sampleSize = countOfCurrentPoints * samplingFactor < minSampleSize ? minSampleSize :countOfCurrentPoints * samplingFactor;
     sampleSize = countOfCurrentPoints < sampleSize ? countOfCurrentPoints : sampleSize;
 	int iForestRamUsed = getValue(1);
-	iforest *iForestObject = new iforest(trainDataObject, numOfTrees, sampleSize, exLevel, numOfTrialsForHyperplane);
+	iforest *iForestObject = new iforest(trainDataObject, numOfTrees, sampleSize, numOfAttributes, numOfTrialsForHyperplane);
     struct timespec start_iF,end_iF;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_iF);
 
@@ -95,9 +96,6 @@ int main(int argc, char* argv[])
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_iF); 
 	iForestRamUsed = getValue(1) - iForestRamUsed;
 	double iFTime =  (((end_iF.tv_sec - start_iF.tv_sec) * 1e9)+(end_iF.tv_nsec - start_iF.tv_nsec))*1e-9;
-
-    //cout<<"RAM="<<iForestRamUsed<<endl;
-    //cout << "Time taken to create iforest: " << fixed << iFTime<<"sec"<<endl;
 	
 	 
 	/*****************************Anomaly detection(AD): Path length computation*********************************************************/
@@ -107,7 +105,6 @@ int main(int argc, char* argv[])
     
    
 	for(int pointi =0; pointi < testDataObject.getnumInstances();pointi++){
-	// cout<<pointi<<endl;
     	iForestObject->computeAnomalyScore(pointi, testDataObject);
    	}
    	
@@ -118,15 +115,16 @@ int main(int argc, char* argv[])
     vector<double> AnomalyScore = iForestObject->anomalyScore;
 
 	delete iForestObject;
-	//cout<<"RAM="<<iForestRamUsed<<endl;
     
 	cout<<"dPTime: "<<dPTime<<" iFTime: "<<iFTime<<" ADTime: "<<ADTime<<" iFMemUsed:  "<<iForestRamUsed<<endl;
 
 
 	/****************************************Anomaly Score writing to file**************************************************************/
 
-	string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10, dataFile.length()-14)+"_exlevel_"+to_string(exLevel)+".csv";
-    // cout<<outputFileName<<endl;
+    //This is for testing on different data
+	// string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10, dataFile.length()-14)+"_numOfAttributes_"+to_string(numOfAttributes)+".csv";
+    string outputFileName="anomalyScores/"+dataFile.substr(10, dataFile.length()-14)+"_attributes_taken_"+to_string(numOfAttributes)+"Hyperplanes_tested_"+to_string(numOfTrialsForHyperplane)+".csv";
+
 	ofstream outAnomalyScore(outputFileName, ios::out|ios::binary);
     outAnomalyScore<<"pointId "<<"Ascore "<<"actuallabel"<<endl;
     for(int pointi = 0; pointi < testDataObject.getnumInstances(); pointi++){

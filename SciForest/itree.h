@@ -25,7 +25,7 @@ class itree
     int _maxNumOfNodes;											//2|S|-1
 	int _avgPLEstOfBST;											//estimation of avg height of a iTree
 	int _avgPLCompOfBST;										//actual avg height of iTree
-    int _exLevel;                                               //number of attributes to be considered while choosing hyperplane.
+    int _numOfAttributes;                                               //number of attributes to be considered while choosing hyperplane.
     int _numOfTrialsForHyperplane;                              //number of trials to be taken before choosing the best hyperplane.
 	const data & _dataObject;									//reference of the input dataObject, only a container not responsible for deletion of the object.
     

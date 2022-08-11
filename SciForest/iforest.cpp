@@ -12,7 +12,7 @@ using namespace std;
 
 iforest::iforest(const data & dataObject): _dataObject(dataObject){}
 
-iforest::iforest(const data & dataObject, int numiTrees, int sampleSize, int exLevel, int numOfTrialsForHyperplane):_dataObject(dataObject), _numiTrees(numiTrees), _sampleSize(sampleSize), _exLevel(exLevel), _numOfTrialsForHyperplane(numOfTrialsForHyperplane){
+iforest::iforest(const data & dataObject, int numiTrees, int sampleSize, int numOfAttributes, int numOfTrialsForHyperplane):_dataObject(dataObject), _numiTrees(numiTrees), _sampleSize(sampleSize), _numOfAttributes(numOfAttributes), _numOfTrialsForHyperplane(numOfTrialsForHyperplane){
 	_maxTreeHeight = (int)log2(_sampleSize);
 	_maxNumOfNodes = (int)pow(2.0,_maxTreeHeight+1)-1;
 	_iTrees.resize(_numiTrees);	
@@ -25,7 +25,7 @@ void iforest::constructiForest(){
 	std::random_device random_seed_generator;
 
     for(int treeId = 0; treeId < _numiTrees; treeId++){
-		_iTrees[treeId] = new itree(_dataObject, _sampleSize, _maxTreeHeight, _maxNumOfNodes, _avgPLEstimationOfBST, _exLevel, _numOfTrialsForHyperplane);
+		_iTrees[treeId] = new itree(_dataObject, _sampleSize, _maxTreeHeight, _maxNumOfNodes, _avgPLEstimationOfBST, _numOfAttributes, _numOfTrialsForHyperplane);
 		_iTrees[treeId]->constructiTree(random_seed_generator());
 	}
 
@@ -136,7 +136,7 @@ void iforest::readFOREST(const string & FORESTFile){
     boost::archive::binary_iarchive readNodesArchive(readNodes);
     _iTrees.resize(_numiTrees);
     for(int treeId = 0; treeId < _numiTrees; treeId++){
-    	_iTrees[treeId] = new itree(_dataObject,_sampleSize,_maxTreeHeight,_maxNumOfNodes,_avgPLEstimationOfBST, _exLevel, _numOfTrialsForHyperplane);
+    	_iTrees[treeId] = new itree(_dataObject,_sampleSize,_maxTreeHeight,_maxNumOfNodes,_avgPLEstimationOfBST, _numOfAttributes, _numOfTrialsForHyperplane);
     	
     	treenode *rootNode = new treenode();
     	readNodesArchive >> *(rootNode);

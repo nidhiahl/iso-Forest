@@ -2,6 +2,8 @@
 #include <math.h>
 #include <random>
 
+
+//Standard Deviation Calculator
 class StdDevCalc{
     private:
 
@@ -42,6 +44,7 @@ class StdDevCalc{
     }
 };
 
+//get K random samples out of N without replacement.
 inline std::vector<int> sample_without_replacement(int k, int N)
 {
     std::random_device random_seed_generator;
@@ -61,6 +64,8 @@ inline std::vector<int> sample_without_replacement(int k, int N)
     return result;    
 }
 
+
+//inner product of two vectors
 inline double inner_product(double* curr, std::vector<double>& normal_vector)
 {
     double result=0.0;
@@ -70,7 +75,6 @@ inline double inner_product(double* curr, std::vector<double>& normal_vector)
 
 treenode::treenode()
 {
-    // splitAttribute = -1;
     isLeaf = bool(0);
     nodeId = -1;
     parentId = -1;
@@ -87,7 +91,6 @@ treenode::treenode()
 
 treenode::treenode(int nId): nodeId(nId)
 {
-    // splitAttribute = -1;
     isLeaf = bool(0);
     parentId = nodeId == 0 ? 0 : (nodeId-1)/2;
     lChildId = -1;
@@ -107,7 +110,7 @@ treenode::~treenode()
 }
 
 
-void treenode::splitInfoSelection(const data &dataObject, int &exLevel, int &numOfTrialsForHyperplane, int random_seed){
+void treenode::splitInfoSelection(const data &dataObject, int &numOfAttributes, int &numOfTrialsForHyperplane, int random_seed){
    
     std::mt19937_64 RandomEngine (random_seed);
 
@@ -125,7 +128,7 @@ void treenode::splitInfoSelection(const data &dataObject, int &exLevel, int &num
     for(int trial=0; trial<numOfTrialsForHyperplane; trial++)
     {
         //get the attributes to be considered.
-        normvect_zero_index = sample_without_replacement (dataObject.getnumAttributes()-exLevel-1, dataObject.getnumAttributes());
+        normvect_zero_index = sample_without_replacement (dataObject.getnumAttributes()-numOfAttributes, dataObject.getnumAttributes());
 
         //get Normal vector of hyperplane.
         trial_normal_vector.resize(dataObject.getnumAttributes(), 0.0);
@@ -135,7 +138,7 @@ void treenode::splitInfoSelection(const data &dataObject, int &exLevel, int &num
         }
 
         //set normal vector component as 0.0 for attributes not to be considered.
-        for(int i=0; i<dataObject.getnumAttributes()-exLevel-1; i++)
+        for(int i=0; i<dataObject.getnumAttributes()-numOfAttributes; i++)
         {
             trial_normal_vector[normvect_zero_index[i]-1] = 0.0;
         }
@@ -174,7 +177,6 @@ void treenode::splitInfoSelection(const data &dataObject, int &exLevel, int &num
         trial_splitvalue=1000000.0;
         for(int i=0; i<dataPointIndices.size(); i++)
         {
-            // cout<<trial_sigma_l[i]+trial_sigma_r[i]<<endl;
             double tmp=( trial_sigma_y - (trial_sigma_l[i]+trial_sigma_r[i])/2.0 )/trial_sigma_y;
             if(tmp>trial_sd_gain)
             {
@@ -192,23 +194,8 @@ void treenode::splitInfoSelection(const data &dataObject, int &exLevel, int &num
             lowerLimit=trial_projection_values[0]-trial_projection_values[dataPointIndices.size()-1];
         }
 
-        // for(int i=0;i<normal_vector.size();i++) std::cout<<trial_normal_vector[i]<<" ";
-        // std::cout<<endl;
-        // std::cout<<trial_sd_gain<<endl;
-        // cout<<splitValue<<endl;
-        
     }
-    // std::cout<<endl;
-    // for(int i=0;i<normal_vector.size();i++) std::cout<<normal_vector[i]<<" ";
-    // std::cout<<endl;
-    // std::cout<<sd_gain<<endl;
-    // std::cout<<endl;
-
-    // for(int i=0;i<normal_vector.size();i++) std::cout<<normal_vector[i]<<" ";
-    // std::cout<<endl;
-    // for(int i=0;i<point.size();i++) std::cout<<point[i]<<" ";
-    // std::cout<<endl;
-    // std::cout<<endl;
+  
 }
 
 
