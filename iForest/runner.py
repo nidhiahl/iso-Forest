@@ -17,10 +17,6 @@ avg_ifTime=0.0
 avg_adTime=0.0
 avg_iFMemUsed=0.0
 
-tot_negatives=0
-tot_positives=0
-true_positives=0
-false_positives=0
 
 precision=0.0
 recall=0.0
@@ -38,7 +34,13 @@ os.system("rm -f "+ "results/" +dataset[10:-4]+'_result.csv')
 
 
 
-for run in range(1, runs+1):    
+for run in range(1, runs+1): 
+    
+    tot_negatives=0
+    tot_positives=0
+    true_positives=0
+    false_positives=0   
+
     os.system('./a.out '+dataset+' '+str(numTrees)+' '+str(samplingFactor)+' '+str(minSampleSize)+' >> results/'+dataset[10:-4]+'_result.csv')
 
     data = pd.read_csv('anomalyScores/'+dataset[10:-4]+'.csv', delimiter=' ')
@@ -52,18 +54,28 @@ for run in range(1, runs+1):
         else:
             tot_positives+=1
 
-
+  
     suspected_anomalies=np.flip(np.argsort(ascores))
 
     for rank in range(0, tot_positives):
-        if actual_labels[suspected_anomalies[rank]-1] == 1:
+        if actual_labels[suspected_anomalies[rank]] == 1:
             true_positives+=1
         else :
             false_positives+=1
 
     true_negatives = tot_negatives - false_positives
-    false_negatives = tot_positives - true_positives    
+    false_negatives = tot_positives - true_positives  
 
+    # print("tot positives : ", tot_positives)
+    # print("true positives : ", true_positives)
+    # print("false positives : ", false_positives)
+    # print("tot negatives :", tot_negatives)
+    # print("true negatives : ", true_negatives)
+    # print("false negatives : ", false_negatives)  
+
+    # print((true_positives/(true_positives+false_positives)))
+    # print((true_positives/tot_positives))
+    # print()
 
     precision = precision + ((true_positives/(true_positives+false_positives)) - precision)/run
     recall = recall + ((true_positives/tot_positives) - recall)/run
@@ -74,7 +86,7 @@ for run in range(1, runs+1):
 
     s=0
     for rank in range(0, len(suspected_anomalies)):
-        if actual_labels[suspected_anomalies[rank]-1] == 1:
+        if actual_labels[suspected_anomalies[rank]] == 1:
             s+=rank+1
 
     avg_anomaly_rank = avg_anomaly_rank + ((s/tot_positives) - avg_anomaly_rank)/run
