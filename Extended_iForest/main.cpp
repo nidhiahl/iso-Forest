@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
 
 	delete iForestObject;
     
-	cout<<"dPTime: "<<dPTime<<" iFTime: "<<iFTime<<" ADTime: "<<ADTime<<" iFMemUsed:  "<<iForestRamUsed<<endl;
+	cout<<"dPTime: "<<dPTime<<" iFTime: "<<iFTime<<" ADTime: "<<ADTime<<" iFMemUsed: "<<iForestRamUsed<<endl;
 
 
 	/****************************************Anomaly Score writing to file**************************************************************/
