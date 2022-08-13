@@ -117,14 +117,14 @@ int main(int argc, char* argv[])
 
 	delete iForestObject;
     
-	cout<<"dPTime: "<<dPTime<<" iFTime: "<<iFTime<<" ADTime: "<<ADTime<<" iFMemUsed:  "<<iForestRamUsed<<endl;
+	cout<<"dPTime: "<<dPTime<<" iFTime: "<<iFTime<<" ADTime: "<<ADTime<<" iFMemUsed: "<<iForestRamUsed<<endl;
 
 
 	/****************************************Anomaly Score writing to file**************************************************************/
 
     //This is for testing on different data
 	// string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10, dataFile.length()-14)+"_numOfAttributes_"+to_string(numOfAttributes)+".csv";
-    string outputFileName="anomalyScores/"+dataFile.substr(10, dataFile.length()-14)+"_attributes_taken_"+to_string(numOfAttributes)+"Hyperplanes_tested_"+to_string(numOfTrialsForHyperplane)+".csv";
+    string outputFileName="anomalyScores/"+dataFile.substr(10, dataFile.length()-14)+"_attributes_taken_"+to_string(numOfAttributes)+"_hyperplanes_tested_"+to_string(numOfTrialsForHyperplane)+".csv";
 
 	ofstream outAnomalyScore(outputFileName, ios::out|ios::binary);
     outAnomalyScore<<"pointId "<<"Ascore "<<"actuallabel"<<endl;
