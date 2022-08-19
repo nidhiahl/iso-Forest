@@ -1,4 +1,4 @@
-import sys, os 
+import sys, os
 from unittest import result
 import pandas as pd
 import numpy as np
@@ -11,7 +11,6 @@ dataset = str(sys.argv[1])
 numTrees = 100
 samplingFactor = 0.01
 minSampleSize = 256
-exlevel = 18
 
 avg_dpTime=0.0
 avg_ifTime=0.0
@@ -42,9 +41,9 @@ for run in range(1, runs+1):
     true_positives=0
     false_positives=0   
 
-    os.system('./a.out '+dataset+' '+str(numTrees)+' '+str(samplingFactor)+' '+str(minSampleSize)+' '+str(exlevel)+' >> results/'+dataset[10:-4]+'_result.csv')
+    os.system('./a.out '+dataset+' '+str(numTrees)+' '+str(samplingFactor)+' '+str(minSampleSize)+' >> results/'+dataset[10:-4]+'_result.csv')
 
-    data = pd.read_csv('anomalyScores/'+dataset[10:-4]+'_exlevel_'+str(exlevel)+'.csv', delimiter=' ')
+    data = pd.read_csv('anomalyScores/'+dataset[10:-4]+'.csv', delimiter=' ')
     point_ids = data['pointId'].to_numpy()
     ascores = data['Ascore'].to_numpy()
     actual_labels = data['actuallabel'].to_numpy()
