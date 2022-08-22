@@ -65,7 +65,7 @@ int main(int argc, char* argv[])
     const string &timeFile = argv[7];
     	
     //This is for testing on different data. 
-    // const string &dataFile2 = argv[6];
+    const string &dataFile2 = argv[8];
 	
     /************************************************dataPreparation******************************************************************/
 
@@ -84,10 +84,10 @@ int main(int argc, char* argv[])
     double dPTime =  (((end_dP.tv_sec - start_dP.tv_sec) * 1e9)+(end_dP.tv_nsec - start_dP.tv_nsec))*1e-9;
     
     //This is for testing on different data
-    // data *dataObject2 = new data();
-    // const data &testDataObject = *dataObject2;
-    // dataObject2->createDataVector(dataFile2);
-    const data &testDataObject = *dataObject;
+    data *dataObject2 = new data();
+    const data &testDataObject = *dataObject2;
+    dataObject2->createDataVector(dataFile2);
+    // const data &testDataObject = *dataObject;
  
     /************************************************iForest creation***************************************************/
     int sampleSize;
@@ -104,18 +104,16 @@ int main(int argc, char* argv[])
 	iForestRamUsed = getValue(1) - iForestRamUsed;
 	double iFTime =  (((end_iF.tv_sec - start_iF.tv_sec) * 1e9)+(end_iF.tv_nsec - start_iF.tv_nsec))*1e-9;
 
-	
 	 
 	/*****************************Anomaly detection(AD): Path length computation*********************************************************/
 	
 	struct timespec start_AD,end_AD;
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start_AD);
     
-   
 	for(int pointi =0; pointi < testDataObject.getnumInstances();pointi++){
     	iForestObject->computeAnomalyScore(pointi, testDataObject);
    	}
-   	
+
    	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &end_AD);
 	iForestRamUsed = getValue(1) - iForestRamUsed;
 	double ADTime =  (((end_AD.tv_sec - start_AD.tv_sec) * 1e9)+(end_AD.tv_nsec - start_AD.tv_nsec))*1e-9;
@@ -130,8 +128,8 @@ int main(int argc, char* argv[])
 	/****************************************Anomaly Score writing to file**************************************************************/
 
     //This is for testing on different data
-	// string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10, dataFile.length()-14)+"_exlevel_"+to_string(exLevel)+".csv";
-    string outputFileName="anomalyScores/"+dataFile.substr(10, dataFile.length()-14)+"_dicNumber_"+to_string(dic_number)+"_alpha_"+to_string(alpha)+".csv";
+	string outputFileName="anomalyScores/"+dataFile2.substr(10,dataFile2.length()-14)+"_tested_over_"+dataFile.substr(10, dataFile.length()-14)+"_dicNumber_"+to_string(dic_number)+"_alpha_"+to_string(alpha)+".csv";
+    // string outputFileName="anomalyScores/"+dataFile.substr(10, dataFile.length()-14)+"_dicNumber_"+to_string(dic_number)+"_alpha_"+to_string(alpha)+".csv";
 
 	ofstream outAnomalyScore(outputFileName, ios::out|ios::binary);
     outAnomalyScore<<"pointId "<<"Ascore "<<"actuallabel"<<endl;

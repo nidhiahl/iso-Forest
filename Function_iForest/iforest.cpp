@@ -28,7 +28,6 @@ void iforest::constructiForest(){
 		_iTrees[treeId] = new itree(_dataObject, _sampleSize, _maxTreeHeight, _maxNumOfNodes, _avgPLEstimationOfBST, _alpha, _dic_number, _timeDataObject);
 		_iTrees[treeId]->constructiTree(random_seed_generator());
 	}
-
 	//_avgPLComputationOfBST = this->avgPathLengthComputationOfBST();
 	_avgPLEstimationOfBST = this->avgPathLengthEstimationOfBST(_sampleSize);
 }

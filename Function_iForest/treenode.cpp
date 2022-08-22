@@ -99,7 +99,6 @@ inline double inner_product(double* X1, double* X2, double* time, double alpha, 
 	 * 'alpha=0.5' corresponds to the Sobolev innerproduct
 	 * 'alpha=0' corresponds to the derivative innerproduct. 
 	*/
-
     double result = 0.0;
 
     if(alpha == 1)
@@ -131,6 +130,7 @@ inline double inner_product(double* X1, double* X2, double* time, double alpha, 
     }
     else
     {
+
         std::vector<double> prod_derivate(dim-1, 0.0);
         std::vector<double> X1_derivate(dim-1, 0.0);
         std::vector<double> X2_derivate(dim-1, 0.0);
@@ -152,7 +152,7 @@ inline double inner_product(double* X1, double* X2, double* time, double alpha, 
             norm_X1 += step_time[i-1] * (std::pow (X1[i], 2.0) + std::pow (X1[i-1], 2.0)) / 2.0;
 			norm_X2 += step_time[i-1] * (std::pow (X2[i], 2.0) + std::pow (X2[i-1], 2.0)) / 2.0;
         }
-
+  
         X1_derivate = derivate(X1, time, dim);
 		X2_derivate = derivate(X2, time, dim);
 
@@ -167,7 +167,7 @@ inline double inner_product(double* X1, double* X2, double* time, double alpha, 
 
         result = alpha * inner / (std::sqrt (norm_X1) * std::sqrt (norm_X2)) + (1 - alpha) * inner_derivate / (std::sqrt (norm_X1_derivate) * std::sqrt (norm_X2_derivate));
     }
-
+  
     return result;
 }
 
@@ -234,10 +234,13 @@ treenode::~treenode()
 double treenode::splitInfoSelection(const data &dataObject, double alpha, int dic_number, const data &timeDataObject, int random_seed){
    
     std::mt19937_64 RandomEngine (random_seed);
-
     innerprod.resize(dataPointIndices.size(), 0.0);
-
     dic_vector = dictionary_function(dataObject.getnumAttributes(), dic_number);
+    // for(int i=0;i<dic_vector.size();i++)
+    // {
+    //     cout<<dic_vector[i]<<" ";
+    // }
+    // cout<<endl;
     for(int i=0; i<dataPointIndices.size(); i++)
     {
         innerprod[i] = inner_product(dataObject.dataVector[i]->attributes, &dic_vector[0], timeDataObject.dataVector[0]->attributes, alpha, dataObject.getnumAttributes());
@@ -245,7 +248,7 @@ double treenode::splitInfoSelection(const data &dataObject, double alpha, int di
 
     minimumVal = *std::min_element(std::begin(innerprod), std::end(innerprod));
     maximumVal = *std::max_element(std::begin(innerprod), std::end(innerprod));
-    
+ 
     return std::uniform_real_distribution<double> (minimumVal, maximumVal)(RandomEngine);
 }
 

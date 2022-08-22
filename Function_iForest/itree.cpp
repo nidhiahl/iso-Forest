@@ -17,6 +17,7 @@ inline std::vector<double> derivate (double* X1, double* time, int dim)
 
 inline double inner_product(double* X1, double* X2, double* time, double alpha, int dim)
 {
+	cout<<"hi from inner prod"<<endl;
     /* Return the innerproduct between X1 and X2 as a convex combination
 	 *between L2 innerproduct and the L2 innerproduct of derivatives. 
 	 *
@@ -109,10 +110,8 @@ void itree::constructiTree(int random_seed){
     rootNode = new treenode(0);
     rootNode->dataPointIndices = _dataObject.getSample(_sampleSize);
 	std::random_device random_seed_generator;
-    
     queue<treenode*> BFTforNodes;
     BFTforNodes.push(rootNode);
-	
     while(!BFTforNodes.empty()){
     	treenode *currNode = BFTforNodes.front();
 		BFTforNodes.pop();
@@ -126,7 +125,6 @@ void itree::constructiTree(int random_seed){
         		currNode->dataPointIndices.resize(0);
     		}
     		else{
-
     			currNode->splitValue = currNode->splitInfoSelection(_dataObject, _alpha, _dic_number, _timeDataObject, random_seed_generator()+random_seed);
 				currNode->createLeftChild();
 				currNode->createRightChild();
@@ -158,7 +156,7 @@ long double itree::computePathLength(int pointX, const data & testDataObject){
 	long double pathLength = 0;
 	treenode * node = rootNode;
 	while(!node->isLeaf){
-		double pointxdotn = inner_product(testDataObject.dataVector[pointX]->attributes, &node->dic_vector[0], _timeDataObject.dataVector[pointX]->attributes, _alpha, testDataObject.getnumAttributes());
+		double pointxdotn = inner_product(testDataObject.dataVector[pointX]->attributes, &node->dic_vector[0], _timeDataObject.dataVector[0]->attributes, _alpha, testDataObject.getnumAttributes());
 		if(pointxdotn < node->splitValue){
 			node = node->lChildAdd;
 		}else{
