@@ -24,7 +24,6 @@ void itree::constructiTree(int windowStartIndex, int windowSize){
 			if(currNode->nodeSize <=1 || currNode->nodeHeight ==_maxTreeHeight){
     			currNode->pathLengthEst = pathLengthEstimationForUnbuiltTree(currNode->nodeSize);
         		currNode->isLeaf = bool(1);
-        		//treeNode[nodeId]->isActive = bool(1);
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
     		}
@@ -32,8 +31,7 @@ void itree::constructiTree(int windowStartIndex, int windowSize){
     			currNode->splitValue = currNode->splitInfoSelection(_dataObject);
     			currNode->createLeftChild();
 				currNode->createRightChild();
-				//treenode *left = new treenode(2*nodeId+1);
-        		//treenode *right = new treenode(2*nodeId+2);
+
 				for(int i=0; i<currNode->nodeSize; i++){     
             		if(_dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute]<currNode->splitValue){
                 		currNode->lChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
@@ -43,13 +41,6 @@ void itree::constructiTree(int windowStartIndex, int windowSize){
             		}
 
         		}
-        		//left->parentAdd = currNode;
-        		//currNode->lChildAdd = left;
-        		//currNode->lChildId = left->nodeId;
-        		
-        		//right->parentAdd = currNode;
-        		//currNode->rChildAdd = right;
-        		//currNode->rChildId = right->nodeId;
         		
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);

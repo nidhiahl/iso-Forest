@@ -236,14 +236,10 @@ double treenode::splitInfoSelection(const data &dataObject, double alpha, int di
     std::mt19937_64 RandomEngine (random_seed);
     innerprod.resize(dataPointIndices.size(), 0.0);
     dic_vector = dictionary_function(dataObject.getnumAttributes(), dic_number);
-    // for(int i=0;i<dic_vector.size();i++)
-    // {
-    //     cout<<dic_vector[i]<<" ";
-    // }
-    // cout<<endl;
+
     for(int i=0; i<dataPointIndices.size(); i++)
     {
-        innerprod[i] = inner_product(dataObject.dataVector[i]->attributes, &dic_vector[0], timeDataObject.dataVector[0]->attributes, alpha, dataObject.getnumAttributes());
+        innerprod[i] = inner_product(dataObject.dataVector[dataPointIndices[i]]->attributes, &dic_vector[0], timeDataObject.dataVector[0]->attributes, alpha, dataObject.getnumAttributes());
     }
 
     minimumVal = *std::min_element(std::begin(innerprod), std::end(innerprod));

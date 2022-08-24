@@ -2,8 +2,7 @@
 #include <math.h>
 #include <random>
 
-
-treenode::treenode()
+treenode::treenode(int height)
 {
     splitAttribute = -1;
     isLeaf = bool(0);
@@ -11,50 +10,163 @@ treenode::treenode()
     pathLengthEst = 0;
     dataPointIndices.resize(0);
     children.resize(0);
-
+	centroid=0.0;
+	leftLimit=0.0;
+	rightLimit=0.0;
+	nodeHeight=height;
 }
 
 
 treenode::~treenode()
-{
+{ 
     //dtor
 }
 
-treenode::createChild()
+void treenode::createChild()
 {
-    treenode *newNode = new treenode();
+    treenode *newNode = new treenode(nodeHeight+1);
     children.push_back(newNode);
 }
 
-double treenode::splitInfoSelection(const data &dataObject){
-
+//get K random samples out of N without replacement.
+inline std::vector<int> sample_without_replacement(int k, int N)
+{
     std::random_device random_seed_generator;
     std::mt19937_64 RandomEngine(random_seed_generator());
 
-	double maxVal = -999999.0;
-	double minVal = 999999.0;
-	int attempts = 0;
-	while(attempts < 10){
-        splitAttribute = std::uniform_int_distribution<>(0, dataObject.getnumAttributes()-1)(RandomEngine);
+    std::unordered_set<int> samples;
 
-		for( int i = 0; i < dataPointIndices.size(); i++){
-        		if(maxVal < dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute]){
-				maxVal = dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute];
+    for(int i=N-k+1; i<N+1; i++)
+    {
+        int v=std::uniform_int_distribution<>(1, i)(RandomEngine);
+        if(!samples.insert(v).second) samples.insert(i);
+    }
+
+    std::vector<int> result(samples.begin(), samples.end());
+    std::shuffle(result.begin(), result.end(), RandomEngine);
+
+    return result;    
+}
+
+double knn(int k, vector<double>& data, vector<vector<double>>& centroids, vector<vector<double>>& leftLimits, vector<vector<double>>& rightLimits)
+{
+	
+	vector<double> centroid(k, 0.0);
+	vector<int> cluster(data.size(), -1);
+	vector<double> clusterSize(k, 0.0);
+	vector<double> leftLimit(k, 999999.0);
+	vector<double> rightLimit(k, -999999.0);
+
+	//get Random centroids
+	vector<int> samples=sample_without_replacement(k, data.size());
+	for(int i=0;i<k;i++) centroid[i]=data[samples[i]-1];
+	sort(centroid.begin(), centroid.end());
+
+	double wcss;
+	bool change=true;
+	while(change)       //while the process has not converged
+	{
+		wcss=0.0;
+		change=false;
+		//assign datapoints to clusters
+		for(int i=0;i<data.size();i++)
+		{
+			double dis=999999.0;
+			int clusterid=-1;
+			for(int j=0;j<k;j++)
+			{
+				if(dis>abs(data[i]-centroid[j]))
+				{
+					dis=abs(data[i]-centroid[j]);
+					clusterid=j;
+				}
 			}
-        		if(minVal > dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute]){
-        			minVal = dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute];
-        		}
-        }
-        attempts = attempts + 1;
-        double dataDiff = maxVal - minVal;
-		if(dataDiff >= 0.0000000000000001){
-			attempts = 10;
+
+			if(cluster[i]!=clusterid)
+			{
+				change=true;
+				cluster[i]=clusterid;
+			}
+
+			wcss+=abs(data[i]-centroid[cluster[i]]);
+		}
+
+		//get new centroids
+		clusterSize.resize(k, 0.0);
+		centroid.resize(k, 0.0);
+		leftLimit.resize(k, 999999.0);
+		rightLimit.resize(k, -999999.0);
+
+		for(int i=0;i<data.size();i++)
+		{
+			clusterSize[cluster[i]]+=1.0;
+			centroid[cluster[i]] += (data[i] - centroid[cluster[i]]) / clusterSize[cluster[i]];
+			leftLimit[cluster[i]]=min(leftLimit[cluster[i]], data[i]);
+			rightLimit[cluster[i]]=max(rightLimit[cluster[i]], data[i]);
 		}
 	}
-	maximumVal = maxVal;
-	minimumVal = minVal;
 
-    return std::uniform_real_distribution<double> (minVal, maxVal)(RandomEngine);
+	centroids.push_back(centroid);
+	leftLimits.push_back(leftLimit);
+	rightLimits.push_back(rightLimit);
+	return wcss;
+}
+
+int elbow(vector<double>& wcss)
+{
+	int optimalK=1;
+	double mx_secDer=0.0;
+
+	for(int i=1;i<wcss.size()-1;i++)
+	{
+		if(mx_secDer<wcss[i-1]+wcss[i+1]-2*wcss[i])
+		{
+			mx_secDer=wcss[i-1]+wcss[i+1]-2*wcss[i];
+			optimalK=i;
+		}
+		
+	}
+
+	return optimalK+1;
+}
+
+void treenode::splitInfoSelection(const data &dataObject){
+	
+    std::random_device random_seed_generator;
+    std::mt19937_64 RandomEngine(random_seed_generator());
+	splitAttribute = std::uniform_int_distribution<>(0, dataObject.getnumAttributes()-1)(RandomEngine);
+	
+	vector<double> data(dataPointIndices.size());
+	for(int i=0; i<dataPointIndices.size();i++)
+	{
+		data[i]=dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute];
+	}
+
+	vector<vector<double>> centroids;
+	vector<vector<double>> leftLimits;
+	vector<vector<double>> rightLimits;
+	vector<double> wcss;
+
+	int possibleK=10;
+	if(data.size()<10) possibleK=data.size();
+
+	for(int i=0;i<possibleK;i++)
+	{
+		wcss.push_back(knn(i+1, data, centroids, leftLimits, rightLimits));
+	}
+
+	int optimalK=elbow(wcss);
+	// cout<<optimalK<<endl;
+
+	for(int i=0;i<optimalK;i++)
+	{
+		createChild();
+		children[i]->centroid=centroids[optimalK-1][i];
+		children[i]->leftLimit=leftLimits[optimalK-1][i];
+		children[i]->rightLimit=rightLimits[optimalK-1][i];
+
+		// cout<<children[i]->leftLimit<<" "<<children[i]->centroid<<" "<<children[i]->rightLimit<<endl;
+	}
 }
 
 

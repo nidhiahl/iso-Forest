@@ -17,7 +17,6 @@ inline std::vector<double> derivate (double* X1, double* time, int dim)
 
 inline double inner_product(double* X1, double* X2, double* time, double alpha, int dim)
 {
-	cout<<"hi from inner prod"<<endl;
     /* Return the innerproduct between X1 and X2 as a convex combination
 	 *between L2 innerproduct and the L2 innerproduct of derivatives. 
 	 *

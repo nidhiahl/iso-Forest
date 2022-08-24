@@ -10,10 +10,11 @@ itree::itree(const data & dataObject, int sampleSize, int maxTreeHeight, int max
 itree::~itree(){}
 //*************************************************STATIC iTree creation*******************************************************************//
 void itree::constructiTree(){
-    rootNode = new treenode(0);
-    rootNode->dataPointIndices = _dataObject.getSample(_sampleSize);
-    queue<treenode*> BFTforNodes;
+    rootNode = new treenode(1);
+	rootNode->dataPointIndices = _dataObject.getSample(_sampleSize);
+	queue<treenode*> BFTforNodes;
     BFTforNodes.push(rootNode);
+
     while(!BFTforNodes.empty()){
     	treenode *currNode = BFTforNodes.front();
 		BFTforNodes.pop();
@@ -27,45 +28,91 @@ void itree::constructiTree(){
         		currNode->dataPointIndices.resize(0);
     		}
     		else{
-    			currNode->splitValue = currNode->splitInfoSelection(_dataObject);
-    			// currNode->createLeftChild();
-				// currNode->createRightChild();
+    			currNode->splitInfoSelection(_dataObject);
+   
 				for(int i=0; i<currNode->nodeSize; i++){     
-            		if(_dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute]<currNode->splitValue){
-                		currNode->lChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
-            		}
-            		else{
-                		currNode->rChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
-            		}
 
+					for(int j=0;j<currNode->children.size();j++)
+					{
+						if(currNode->children[j]->leftLimit <= _dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute] 
+						&& _dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute] <= currNode->children[j]->rightLimit)
+						{
+							currNode->children[j]->dataPointIndices.push_back(currNode->dataPointIndices[i]);
+						}
+					}					
         		}
         		
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
         		
-        		BFTforNodes.push(currNode->lChildAdd);
-        		BFTforNodes.push(currNode->rChildAdd);
+				for(int i=0;i<currNode->children.size();i++)
+				{
+					BFTforNodes.push(currNode->children[i]);
+				}
     		}
     	}
-    }
+	}
     _avgPLCompOfBST = 	this->avgPathLengthComputationOfBST();
 }
 
 
 //*******************************************************Compute path length**************************************************************//
-long double itree::computePathLength(int pointX, const data & testDataObject){
-	long double pathLength = 0;
+long double itree::computeAnomalyScore(int pointX, const data & testDataObject){
+	long double anomalyScore = 0.0;
+	long double numOfNodes = 0.0;
 	treenode * node = rootNode;
+
+
 	while(!node->isLeaf){
-		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] < node->splitValue){
-			node = node->lChildAdd;
-		}else{
-			node = node->rChildAdd;
+		cout<<anomalyScore<<endl;
+		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] <= node->children[0]->centroid)
+		{
+			node = node->children[0];
+			if(node->centroid == node->leftLimit)
+				anomalyScore+=1.0;
+			else 
+				anomalyScore += (node->centroid-testDataObject.dataVector[pointX]->attributes[node->splitAttribute])/(node->centroid - node->leftLimit);
 		}
+		else if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] >= node->children[node->children.size()-1]->centroid)
+		{
+			node = node->children[node->children.size()-1];
+			if(node->rightLimit == node->centroid)
+				anomalyScore+=1.0;
+			else
+				anomalyScore += (testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid)/(node->rightLimit - node->centroid);
+		}
+		else
+		{
+			for(int i=1;i<node->children.size();i++)
+			{
+				if(node->children[i-1]->centroid <= testDataObject.dataVector[pointX]->attributes[node->splitAttribute] 
+				&& testDataObject.dataVector[pointX]->attributes[node->splitAttribute] <= node->children[i]->centroid)
+				{
+					if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->children[i-1]->centroid < node->children[i]->centroid-testDataObject.dataVector[pointX]->attributes[node->splitAttribute] )
+					{
+						node=node->children[i-1];
+						if(node->rightLimit == node->centroid)
+							anomalyScore += 1.0;
+						else
+							anomalyScore += (testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid)/(node->rightLimit - node->centroid);
+					}
+					else
+					{
+						node=node->children[i];
+						if(node->centroid == node->leftLimit)
+							anomalyScore += 1.0;
+						else
+							anomalyScore += (node->centroid-testDataObject.dataVector[pointX]->attributes[node->splitAttribute])/(node->centroid - node->leftLimit);
+					}
+					
+				}
+			}
+		}
+
+		numOfNodes += 1.0;	
 	}
 	
-	pathLength = node->nodeHeight - 1 + node->pathLengthEst;
-	return pathLength;
+	return anomalyScore/numOfNodes;
 }
 
 long double itree::avgPathLengthComputationOfBST(){
@@ -79,8 +126,10 @@ long double itree::avgPathLengthComputationOfBST(){
 		if(node->isLeaf){
 			avgActualPathLengthOfBST += node->nodeSize*(node->nodeHeight-1+ node->pathLengthEst);
 		}else{
-			BFTqueue.push(node->lChildAdd);
-			BFTqueue.push(node->rChildAdd);
+			for(int i=0;i<node->children.size();i++)
+			{
+				BFTqueue.push(node->children[i]);
+			}
 		}
 	}
 	avgActualPathLengthOfBST /= _sampleSize;
