@@ -62,54 +62,32 @@ long double itree::computeAnomalyScore(int pointX, const data & testDataObject){
 	long double numOfNodes = 0.0;
 	treenode * node = rootNode;
 
+	while(node!=NULL){
+		// cout<<anomalyScore<<endl;
+		// cout<<node->splitAttribute<<endl;
 
-	while(!node->isLeaf){
-		cout<<anomalyScore<<endl;
-		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] <= node->children[0]->centroid)
+		numOfNodes+=1.0;
+		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]<node->leftLimit || testDataObject.dataVector[pointX]->attributes[node->splitAttribute]>node->rightLimit || node->rightLimit==node->leftLimit)
 		{
-			node = node->children[0];
-			if(node->centroid == node->leftLimit)
-				anomalyScore+=1.0;
-			else 
-				anomalyScore += (node->centroid-testDataObject.dataVector[pointX]->attributes[node->splitAttribute])/(node->centroid - node->leftLimit);
+			anomalyScore+=1.0;
+			break;
 		}
-		else if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute] >= node->children[node->children.size()-1]->centroid)
+
+		anomalyScore += (abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid)) / (node->rightLimit - node->leftLimit);
+
+		int index=-1;
+		double dis=999999.0;
+		for(int i=0;i<node->children.size();i++)
 		{
-			node = node->children[node->children.size()-1];
-			if(node->rightLimit == node->centroid)
-				anomalyScore+=1.0;
-			else
-				anomalyScore += (testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid)/(node->rightLimit - node->centroid);
-		}
-		else
-		{
-			for(int i=1;i<node->children.size();i++)
+			if(dis>abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid))
 			{
-				if(node->children[i-1]->centroid <= testDataObject.dataVector[pointX]->attributes[node->splitAttribute] 
-				&& testDataObject.dataVector[pointX]->attributes[node->splitAttribute] <= node->children[i]->centroid)
-				{
-					if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->children[i-1]->centroid < node->children[i]->centroid-testDataObject.dataVector[pointX]->attributes[node->splitAttribute] )
-					{
-						node=node->children[i-1];
-						if(node->rightLimit == node->centroid)
-							anomalyScore += 1.0;
-						else
-							anomalyScore += (testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid)/(node->rightLimit - node->centroid);
-					}
-					else
-					{
-						node=node->children[i];
-						if(node->centroid == node->leftLimit)
-							anomalyScore += 1.0;
-						else
-							anomalyScore += (node->centroid-testDataObject.dataVector[pointX]->attributes[node->splitAttribute])/(node->centroid - node->leftLimit);
-					}
-					
-				}
+				dis=abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid);
+				index=i;
 			}
 		}
 
-		numOfNodes += 1.0;	
+		node=node->children[index];
+	
 	}
 	
 	return anomalyScore/numOfNodes;

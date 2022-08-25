@@ -22,7 +22,6 @@ iforest::~iforest(){}
 //***************************************************Training: iForest creation*********************************************************//
 void iforest::constructiForest(){
     for(int treeId = 0; treeId < _numiTrees; treeId++){
-		cout<<treeId<<endl;
 		_iTrees[treeId] = new itree(_dataObject, _sampleSize, _maxTreeHeight, _maxNumOfNodes, _avgPLEstimationOfBST);
 		_iTrees[treeId]->constructiTree();
 	}
@@ -62,6 +61,7 @@ long double iforest::computeAvgPathLength(int pointX, const data & testDataObjec
 		avgPathLength += _iTrees[treeId]->computeAnomalyScore(pointX, testDataObject);
 	}
 	avgPathLength /=_numiTrees;
+	
 	return avgPathLength;
 }
 

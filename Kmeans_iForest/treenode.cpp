@@ -136,10 +136,15 @@ void treenode::splitInfoSelection(const data &dataObject){
     std::mt19937_64 RandomEngine(random_seed_generator());
 	splitAttribute = std::uniform_int_distribution<>(0, dataObject.getnumAttributes()-1)(RandomEngine);
 	
+	rightLimit=-999999.0;
+	leftLimit=999999.0;
+	
 	vector<double> data(dataPointIndices.size());
 	for(int i=0; i<dataPointIndices.size();i++)
 	{
 		data[i]=dataObject.dataVector[(dataPointIndices[i])]->attributes[splitAttribute];
+		leftLimit=min(leftLimit, data[i]);
+		rightLimit=max(rightLimit, data[i]);
 	}
 
 	vector<vector<double>> centroids;
