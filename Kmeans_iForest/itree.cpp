@@ -63,8 +63,6 @@ long double itree::computeAnomalyScore(int pointX, const data & testDataObject){
 	treenode * node = rootNode;
 
 	while(node!=NULL){
-		// cout<<anomalyScore<<endl;
-		// cout<<node->splitAttribute<<endl;
 
 		numOfNodes+=1.0;
 		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]<node->leftLimit || testDataObject.dataVector[pointX]->attributes[node->splitAttribute]>node->rightLimit || node->rightLimit==node->leftLimit)
