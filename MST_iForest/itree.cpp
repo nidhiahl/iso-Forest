@@ -57,7 +57,14 @@ void generalise(double* oldData, vector<long double>& mean, vector<long double>&
 {
 	for(int j=0;j<mean.size();j++)
 	{
-		newData.push_back((oldData[j]-mean[j])/(standard_dev[j]));
+		if(standard_dev[j]==0.0)
+		{
+			newData.push_back(oldData[j]-mean[j]);
+		}
+		else
+		{
+			newData.push_back((oldData[j]-mean[j])/(standard_dev[j]));
+		}
 	}
 }
 
@@ -93,8 +100,10 @@ double euclidean_dis(vector<double>& node1, vector<double>& node2)
 	for(int j=0; j<node1.size(); j++)
 	{
 		squared_dist+=(node1[j] - node2[j])*(node1[j] - node2[j]);
+		// cout<<squared_dist<<endl;
 	}
 
+	// cout<<squared_dist<<endl;
 	return sqrt(squared_dist);
 }
 

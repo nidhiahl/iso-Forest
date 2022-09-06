@@ -58,6 +58,7 @@ long double iforest::avgPathLengthComputationOfBST(){
 long double iforest::computeAvgPathLength(int pointX, const data & testDataObject){
 	long double avgPathLength = 0;
 	for(int treeId = 0; treeId < _numiTrees; treeId++){
+		// cout<<treeId<<endl;
 		avgPathLength += _iTrees[treeId]->computeAnomalyScore(pointX, testDataObject);
 	}
 	avgPathLength /=_numiTrees;

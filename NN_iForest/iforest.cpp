@@ -40,7 +40,6 @@ void iforest::computeAnomalyScore(int pointX, const data & testDataObject){
 		avgAnomalyScore += _iTrees[treeId]->computeAnomalyScore(pointX, testDataObject);
 	}
 	avgAnomalyScore /=_numiTrees;
-
 	anomalyScore.push_back(avgAnomalyScore);
 }
 

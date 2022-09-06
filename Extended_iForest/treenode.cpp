@@ -85,6 +85,7 @@ double treenode::splitInfoSelection(const data &dataObject, int &exLevel, int ra
     }
 
     //get random point from which the hyperplane would pass.
+    std::vector<double> point;
     point.resize(dataObject.getnumAttributes(), 0.0);
     for(int i=0; i<dataObject.getnumAttributes(); i++)
     {

@@ -26,6 +26,7 @@ void itree::constructiTree(){
         		currNode->isLeaf = bool(1);
         		currNode->dataPointIndices.clear();
         		currNode->dataPointIndices.resize(0);
+				// cout<<currNode->leftLimit<<" "<<currNode->centroid<<" "<<currNode->rightLimit<<endl;
     		}
     		else{
     			currNode->splitInfoSelection(_dataObject);
@@ -37,6 +38,7 @@ void itree::constructiTree(){
 						if(currNode->children[j]->leftLimit <= _dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute] 
 						&& _dataObject.dataVector[currNode->dataPointIndices[i]]->attributes[currNode->splitAttribute] <= currNode->children[j]->rightLimit)
 						{
+							// cout<<j<<endl;
 							currNode->children[j]->dataPointIndices.push_back(currNode->dataPointIndices[i]);
 						}
 					}					
@@ -49,8 +51,11 @@ void itree::constructiTree(){
 				{
 					BFTforNodes.push(currNode->children[i]);
 				}
+
+				// cout<<currNode->leftLimit<<" "<<currNode->centroid<<" "<<currNode->rightLimit<<endl;
     		}
     	}
+			
 	}
     _avgPLCompOfBST = 	this->avgPathLengthComputationOfBST();
 }
@@ -65,7 +70,7 @@ long double itree::computeAnomalyScore(int pointX, const data & testDataObject){
 	while(node!=NULL){
 
 		numOfNodes+=1.0;
-		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]<node->leftLimit || testDataObject.dataVector[pointX]->attributes[node->splitAttribute]>node->rightLimit || node->rightLimit==node->leftLimit)
+		if(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]<=node->leftLimit || testDataObject.dataVector[pointX]->attributes[node->splitAttribute]>=node->rightLimit || node->rightLimit==node->leftLimit)
 		{
 			anomalyScore+=1.0;
 			break;
@@ -77,15 +82,21 @@ long double itree::computeAnomalyScore(int pointX, const data & testDataObject){
 		double dis=999999.0;
 		for(int i=0;i<node->children.size();i++)
 		{
-			if(dis>abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid))
+			if(dis>abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->children[i]->centroid))
 			{
-				dis=abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->centroid);
+				dis=abs(testDataObject.dataVector[pointX]->attributes[node->splitAttribute]-node->children[i]->centroid);
 				index=i;
 			}
 		}
-
-		node=node->children[index];
-	
+		
+		if(node->isLeaf)
+		{
+			node=NULL;
+		}
+		else
+		{
+			node=node->children[index];
+		}
 	}
 	
 	return anomalyScore/numOfNodes;

@@ -90,7 +90,14 @@ long double itree::computeAnomalyScore(int pointX, const data & testDataObject){
 
 	if(smallestHypersphereIndex>=0)
 	{
-		anomalyScore -= hyperspheres[smallestHypersphereIndex]->nearestNeighbour->radius/hyperspheres[smallestHypersphereIndex]->radius;
+		if(hyperspheres[smallestHypersphereIndex]->radius==0.0)
+		{
+			anomalyScore-=1.0;
+		}
+		else
+		{
+			anomalyScore -= hyperspheres[smallestHypersphereIndex]->nearestNeighbour->radius/hyperspheres[smallestHypersphereIndex]->radius;
+		}
 	}
 
 	return anomalyScore;

@@ -11,8 +11,8 @@ treenode::treenode(int height)
     dataPointIndices.resize(0);
     children.resize(0);
 	centroid=0.0;
-	leftLimit=0.0;
-	rightLimit=0.0;
+	leftLimit=999999.0;
+	rightLimit=-999999.0;
 	nodeHeight=height;
 }
 
@@ -48,14 +48,12 @@ inline std::vector<int> sample_without_replacement(int k, int N)
     return result;    
 }
 
-double knn(int k, vector<double>& data, vector<vector<double>>& centroids, vector<vector<double>>& leftLimits, vector<vector<double>>& rightLimits)
+double knn(int k, vector<double>& data, vector<vector<double>>& centroids)
 {
 	
 	vector<double> centroid(k, 0.0);
 	vector<int> cluster(data.size(), -1);
 	vector<double> clusterSize(k, 0.0);
-	vector<double> leftLimit(k, 999999.0);
-	vector<double> rightLimit(k, -999999.0);
 
 	//get Random centroids
 	vector<int> samples=sample_without_replacement(k, data.size());
@@ -94,21 +92,15 @@ double knn(int k, vector<double>& data, vector<vector<double>>& centroids, vecto
 		//get new centroids
 		clusterSize.resize(k, 0.0);
 		centroid.resize(k, 0.0);
-		leftLimit.resize(k, 999999.0);
-		rightLimit.resize(k, -999999.0);
 
 		for(int i=0;i<data.size();i++)
 		{
 			clusterSize[cluster[i]]+=1.0;
 			centroid[cluster[i]] += (data[i] - centroid[cluster[i]]) / clusterSize[cluster[i]];
-			leftLimit[cluster[i]]=min(leftLimit[cluster[i]], data[i]);
-			rightLimit[cluster[i]]=max(rightLimit[cluster[i]], data[i]);
 		}
 	}
 
 	centroids.push_back(centroid);
-	leftLimits.push_back(leftLimit);
-	rightLimits.push_back(rightLimit);
 	return wcss;
 }
 
@@ -131,13 +123,10 @@ int elbow(vector<double>& wcss)
 }
 
 void treenode::splitInfoSelection(const data &dataObject){
-	
     std::random_device random_seed_generator;
     std::mt19937_64 RandomEngine(random_seed_generator());
 	splitAttribute = std::uniform_int_distribution<>(0, dataObject.getnumAttributes()-1)(RandomEngine);
 	
-	rightLimit=-999999.0;
-	leftLimit=999999.0;
 	
 	vector<double> data(dataPointIndices.size());
 	for(int i=0; i<dataPointIndices.size();i++)
@@ -148,8 +137,6 @@ void treenode::splitInfoSelection(const data &dataObject){
 	}
 
 	vector<vector<double>> centroids;
-	vector<vector<double>> leftLimits;
-	vector<vector<double>> rightLimits;
 	vector<double> wcss;
 
 	int possibleK=10;
@@ -157,19 +144,24 @@ void treenode::splitInfoSelection(const data &dataObject){
 
 	for(int i=0;i<possibleK;i++)
 	{
-		wcss.push_back(knn(i+1, data, centroids, leftLimits, rightLimits));
+		wcss.push_back(knn(i+1, data, centroids));
 	}
 
 	int optimalK=elbow(wcss);
-	// cout<<optimalK<<endl;
 
 	for(int i=0;i<optimalK;i++)
 	{
 		createChild();
 		children[i]->centroid=centroids[optimalK-1][i];
-		children[i]->leftLimit=leftLimits[optimalK-1][i];
-		children[i]->rightLimit=rightLimits[optimalK-1][i];
-
+		children[i]->rightLimit=centroids[optimalK-1][i];
+		children[i]->leftLimit=centroids[optimalK-1][i];
+		
+		if(i>0)
+		{
+			children[i]->leftLimit=(children[i-1]->centroid + children[i]->centroid)/2.0;
+			children[i-1]->rightLimit=(children[i-1]->centroid + children[i]->centroid)/2.0;
+		}
+			
 		// cout<<children[i]->leftLimit<<" "<<children[i]->centroid<<" "<<children[i]->rightLimit<<endl;
 	}
 }

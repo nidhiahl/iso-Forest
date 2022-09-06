@@ -30,9 +30,6 @@ class treenode
         treenode();
         treenode(int);
         virtual ~treenode();
-        double splitInfoSelection(const data &);
-        void createLeftChild();
-		void createRightChild();
 
     protected:
 

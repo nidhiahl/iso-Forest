@@ -20,7 +20,7 @@ class treenode
         vector<int> dataPointIndices;
         // int splitAttribute;
         double splitValue;
-        std::vector<double> point;
+        
         std::vector<double> normal_vector;
         double minimumVal;
         double maximumVal;

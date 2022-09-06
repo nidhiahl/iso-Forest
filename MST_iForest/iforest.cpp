@@ -69,7 +69,7 @@ void iforest::computeAvgPathLengthAndNearestPointDistance(int pointX, const data
 		long double nearestPointDistance;
 
 		_iTrees[treeId]->computePathLengthAndNearestPointDistance(pointX, testDataObject, pathLength, nearestPointDistance);
-
+		// cout<<pathLength<<" "<<nearestPointDistance<<endl;
 		avgPathLength += pathLength;
 		avgNearestPointDistance += nearestPointDistance;
 	}
