@@ -6,6 +6,34 @@ import csv
 import matplotlib.pyplot as plt
 from sklearn import metrics
 
+import numpy as np
+
+class OnlineVariance(object):
+    """
+    Welford's algorithm computes the sample variance incrementally.
+    """
+
+    def __init__(self, iterable=None, ddof=1):
+        self.ddof, self.n, self.mean, self.M2 = ddof, 0, 0.0, 0.0
+        if iterable is not None:
+            for datum in iterable:
+                self.include(datum)
+
+    def include(self, datum):
+        self.n += 1
+        self.delta = datum - self.mean
+        self.mean += self.delta / self.n
+        self.M2 += self.delta * (datum - self.mean)
+
+    @property
+    def variance(self):
+        return self.M2 / (self.n - self.ddof)
+
+    @property
+    def std(self):
+        return np.sqrt(self.variance)
+
+
 runs = 10
 dataset = str(sys.argv[1])
 numTrees = 100
@@ -33,7 +61,6 @@ os.system('g++ ./main.cpp ./data.cpp  ./iforest.cpp ./itree.cpp ./treenode.cpp -
 os.system("rm -f "+ "results/" +dataset[10:-4]+'_result.csv')
 
 
-
 for run in range(1, runs+1): 
     
     tot_negatives=0
@@ -54,10 +81,37 @@ for run in range(1, runs+1):
         else:
             tot_positives+=1
 
-  
+
     suspected_anomalies=np.flip(np.argsort(ascores))
 
-    for rank in range(0, tot_positives):
+    stddev1 = [0.0]
+    ov1 = OnlineVariance(ddof=0)
+    for i in suspected_anomalies:
+        ov1.include(ascores[i])
+        stddev1.append(ov1.std)
+        # print(ov1.std)
+        # print(ascores[suspected_anomalies[i]])
+
+    stddev2 = [0.0]
+    ov2 = OnlineVariance(ddof=0)
+    for i in reversed(suspected_anomalies):
+        ov2.include(ascores[i])
+        stddev2.append(ov2.std)
+        # print(ov2.std)
+
+    mn=999999.0
+    threshold=0.0
+    anomalies = 0
+    for i in range(1, len(stddev1)-1):
+        if(mn>abs(stddev1[i] - stddev2[len(stddev1)-i-1])):
+            mn=abs(stddev1[i] - stddev2[len(stddev1)-i-1])
+            threshold = (ascores[suspected_anomalies[i-1]]+ascores[suspected_anomalies[i]])/2
+            anomalies = i
+
+    print(threshold)
+    print(anomalies)
+
+    for rank in range(0, anomalies):
         if actual_labels[suspected_anomalies[rank]] == 1:
             true_positives+=1
         else :
