@@ -194,8 +194,11 @@ void treenode::splitInfoSelection(const data &dataObject, int &numOfAttributes, 
             lowerLimit=trial_projection_values[0]-trial_projection_values[dataPointIndices.size()-1];
         }
 
+        // cout<< trial_sd_gain<<" ";
     }
-  
+    // cout<<endl;
+    // cout<<sd_gain<<endl;
+    // cout<<endl;
 }
 
 

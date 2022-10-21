@@ -11,7 +11,7 @@ dataset = str(sys.argv[1])
 numTrees = 100
 samplingFactor = 0.01
 minSampleSize = 256
-numOfAttributes = 0
+numOfAttributes = 30
 numOfTrialsForHyperplane = 10
 
 avg_dpTime=0.0

@@ -49,7 +49,7 @@ void itree::constructiTree(int random_seed){
 				for(int i=0; i<currNode->nodeSize; i++)
 				{
 					double currdotn = inner_product(_dataObject.dataVector[currNode->dataPointIndices[i]]->attributes, currNode->normal_vector);
-					if(currdotn < currNode->splitValue){
+					if(currdotn <= currNode->splitValue){
 						currNode->lChildAdd->dataPointIndices.push_back(currNode->dataPointIndices[i]);
 					}
 					else{

@@ -36,7 +36,7 @@ void iforest::constructiForest(){
 void iforest::computeAnomalyScore(int pointX, const data & testDataObject){
 	long double AscoreComputed = 0;
 	for(int treeId = 0; treeId < _numiTrees; treeId++){
-		AscoreComputed += _iTrees[treeId]->computeRelativeMass(pointX, testDataObject, _sampleSize);
+		AscoreComputed += _iTrees[treeId]->computeRelativeMass(pointX, testDataObject);
 	}
 	// cout<<AscoreComputed<<endl;
 	AscoreComputed /=_numiTrees;

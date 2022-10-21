@@ -53,7 +53,7 @@ void itree::constructiTree(){
 
 
 //*******************************************************Compute path length**************************************************************//
-long double itree::computeRelativeMass(int pointX, const data & testDataObject, int sampleSize){
+long double itree::computeRelativeMass(int pointX, const data & testDataObject){
 	long double currSize=0;
 	long double parSize=0;
 
@@ -70,7 +70,7 @@ long double itree::computeRelativeMass(int pointX, const data & testDataObject, 
 	
 	currSize = node->nodeSize;
 	if(currSize==0) return 1;
-	long double relativeMass=parSize/(currSize*(long double)sampleSize);
+	long double relativeMass=parSize/(currSize*(long double)_sampleSize);
 	// cout<<relativeMass<<endl;
 	return relativeMass;
 }
